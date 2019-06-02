@@ -1,0 +1,22 @@
+[package]
+name = "base91"
+version = "0.0.1"
+authors = ["dnsl48 <dnsl48@gmail.com>"]
+edition = "2018"
+
+description = "Encoding binary data as ASCII characters. Similar to base64, but more efficient."
+keywords = ["base91", "decode", "encode"]
+categories = ["encoding"]
+
+license = "MIT/Apache-2.0"
+
+homepage = "https://github.com/dnsl48/base91.git"
+repository = "https://github.com/dnsl48/base91.git"
+readme = "README.md"
+
+documentation = "https://docs.rs/base91/"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
