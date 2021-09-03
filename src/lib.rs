@@ -1,7 +1,6 @@
 #![doc(test(attr(deny(warnings))))]
 
-//! Joachim Henke's basE91 encoding implementation for Rust
-//! <http://base91.sourceforge.net>
+//! Joachim Henke's [basE91 encoding](http://base91.sourceforge.net) implementation for Rust.
 //!
 //! This crate also supports the [custom base91](https://github.com/r-lyeh-archived/base) 
 //! implementation by [r-lyeh](https://github.com/r-lyeh) which supports quoting and is
@@ -194,7 +193,7 @@ pub fn slice_encode(value: &[u8]) -> Vec<u8> {
 /// Which is not possible with the original base91 method. This encoding is quotable and
 /// JSON, XML and TSV friendly.
 ///
-/// This custom base91 is from [r-lyeh's](https://github.com/r-lyeh)
+/// This custom base91 method is from [r-lyeh's](https://github.com/r-lyeh)
 /// [base](https://github.com/r-lyeh-archived/base) project.
 pub fn slice_encode_custom(value: &[u8]) -> Vec<u8> {
     let mut result = Vec::with_capacity(value.len() * 13 / 10);
@@ -215,7 +214,7 @@ pub fn slice_decode(value: &[u8]) -> Vec<u8> {
 
 /// Decode the `value` into binary data according to custom base91 method.
 ///
-/// This custom base91 is from [r-lyeh's](https://github.com/r-lyeh)
+/// This custom base91 method is from [r-lyeh's](https://github.com/r-lyeh)
 /// [base](https://github.com/r-lyeh-archived/base) project.
 pub fn slice_decode_custom(value: &[u8]) -> Vec<u8> {
     let mut result = Vec::with_capacity(value.len());
