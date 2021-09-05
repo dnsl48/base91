@@ -1,7 +1,10 @@
 #![doc(test(attr(deny(warnings))))]
 
-//! Joachim Henke's basE91 encoding implementation for Rust
-//! http://base91.sourceforge.net
+//! Joachim Henke's [basE91 encoding](http://base91.sourceforge.net) implementation for Rust.
+//!
+//! This crate also supports the [custom base91](https://github.com/r-lyeh-archived/base) 
+//! implementation by [r-lyeh](https://github.com/r-lyeh) which supports quoting and is
+//! JSON, XML and TSV friendly.
 
 use std::iter::Iterator;
 
@@ -13,6 +16,16 @@ const ENTAB: [u8; 91] = [
     b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'!', b'#', b'$',
     b'%', b'&', b'(', b')', b'*', b'+', b',', b'.', b'/', b':', b';', b'<', b'=',
     b'>', b'?', b'@', b'[', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~', b'"'
+];
+
+const ENTAB_CUSTOM: [u8; 91] = [
+    b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M',
+    b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X', b'Y', b'Z',
+    b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm',
+    b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z',
+    b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'!', b'#', b'$',
+    b'%', b'&', b'(', b')', b'*', b'+', b',', b'.', b'/', b':', b';', b'-', b'=',
+    b'\\',b'?', b'@', b'[', b']', b'^', b'_', b'`', b'{', b'|', b'}', b'~', b'\''
 ];
 
 const DETAB: [u8; 256] = [
@@ -34,8 +47,26 @@ const DETAB: [u8; 256] = [
     91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91
 ];
 
+const DETAB_CUSTOM: [u8; 256] = [
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 62, 91, 63, 64, 65, 66, 90, 67, 68, 69, 70, 71, 76, 72, 73,
+    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 74, 75, 91, 77, 91, 79,
+    80,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 81, 78, 82, 83, 84,
+    85, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 86, 87, 88, 89, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+    91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91
+];
 
-pub fn iter_encode<I, O>(data: I, mut out: O)
+fn iter_encode_internal<I, O>(data: I, mut out: O, coding: &[u8])
 where
     I: Iterator<Item=u8>,
     O: FnMut(u8)
@@ -60,21 +91,36 @@ where
                 shift -= 14;
             }
 
-            out(ENTAB[(key % 91) as usize]);
-            out(ENTAB[(key / 91) as usize]);
+            out(coding[(key % 91) as usize]);
+            out(coding[(key / 91) as usize]);
         }
     }
 
     if shift > 0 {
-        out(ENTAB[(rem % 91) as usize]);
+        out(coding[(rem % 91) as usize]);
         if shift > 7 || rem > 90 {
-            out(ENTAB[(rem / 91) as usize]);
+            out(coding[(rem / 91) as usize]);
         }
     }
 }
 
+pub fn iter_encode<I, O>(data: I, out: O)
+where
+    I: Iterator<Item=u8>,
+    O: FnMut(u8)
+{
+    iter_encode_internal(data, out, &ENTAB);
+}
 
-pub fn iter_decode<I, O>(data: I, mut out: O)
+pub fn iter_encode_custom<I, O>(data: I, out: O)
+where
+    I: Iterator<Item=u8>,
+    O: FnMut(u8)
+{
+    iter_encode_internal(data, out, &ENTAB_CUSTOM);
+}
+
+fn iter_decode_internal<I, O>(data: I, mut out: O, coding: &[u8])
 where
     I: Iterator<Item=u8>,
     O: FnMut(u8)
@@ -86,7 +132,7 @@ where
     let mut shift: i32 = 0;
 
     for b in data.map(|b| b as usize) {
-        key = DETAB[b] as i32;
+        key = coding[b] as i32;
 
         if key == 91 {
             continue;
@@ -116,7 +162,23 @@ where
     }
 }
 
+pub fn iter_decode<I, O>(data: I, out: O)
+where
+    I: Iterator<Item=u8>,
+    O: FnMut(u8)
+{
+    iter_decode_internal(data, out, &DETAB);
+}
 
+pub fn iter_decode_custom<I, O>(data: I, out: O)
+where
+    I: Iterator<Item=u8>,
+    O: FnMut(u8)
+{
+    iter_decode_internal(data, out, &DETAB_CUSTOM);
+}
+
+/// Encode the `value` into ASCII according to base91 method.
 pub fn slice_encode(value: &[u8]) -> Vec<u8> {
     let mut result = Vec::with_capacity(value.len() * 13 / 10);
 
@@ -125,7 +187,23 @@ pub fn slice_encode(value: &[u8]) -> Vec<u8> {
     result
 }
 
+/// Encode the `value` into ASCII according to custom base91 method.
+///
+/// This encoded data can be "quoted", splitted with tabs, spaces, linefeeds and carriages.
+/// Which is not possible with the original base91 method. This encoding is quotable and
+/// JSON, XML and TSV friendly.
+///
+/// This custom base91 method is from [r-lyeh's](https://github.com/r-lyeh)
+/// [base](https://github.com/r-lyeh-archived/base) project.
+pub fn slice_encode_custom(value: &[u8]) -> Vec<u8> {
+    let mut result = Vec::with_capacity(value.len() * 13 / 10);
 
+    iter_encode_custom(value.iter().map(|v| *v), |v| result.push(v));
+
+    result
+}
+
+/// Decode the `value` into binary data according to base91 method.
 pub fn slice_decode(value: &[u8]) -> Vec<u8> {
     let mut result = Vec::with_capacity(value.len());
 
@@ -134,6 +212,17 @@ pub fn slice_decode(value: &[u8]) -> Vec<u8> {
     result
 }
 
+/// Decode the `value` into binary data according to custom base91 method.
+///
+/// This custom base91 method is from [r-lyeh's](https://github.com/r-lyeh)
+/// [base](https://github.com/r-lyeh-archived/base) project.
+pub fn slice_decode_custom(value: &[u8]) -> Vec<u8> {
+    let mut result = Vec::with_capacity(value.len());
+
+    iter_decode_custom(value.iter().map(|v| *v), |v| result.push(v));
+
+    result
+}
 
 #[cfg(test)]
 mod tests {
