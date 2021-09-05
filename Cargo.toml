@@ -1,12 +1,12 @@
 [package]
 name = "base91"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["dnsl48 <dnsl48@gmail.com>"]
 edition = "2018"
 
 description = "Encoding binary data as ASCII characters. Similar to base64, but more efficient."
-keywords = ["base91", "decode", "encode"]
-categories = ["encoding"]
+keywords = ["base91", "decode", "encode", "no-std"]
+categories = ["encoding", "no-std"]
 
 license = "MIT/Apache-2.0"
 
@@ -20,3 +20,17 @@ documentation = "https://docs.rs/base91/"
 all-features = true
 
 [dependencies]
+
+[dev-dependencies]
+criterion = "0.3"
+
+[features]
+
+default = ["std", "canonical", "xml-friendly"]
+std = []
+canonical = []
+xml-friendly = []
+
+[[bench]]
+name = "base91"
+harness = false
