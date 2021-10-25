@@ -30,7 +30,9 @@ where
         }
     }
 
-    pub fn as_char_iter(self) -> core::iter::Map<EncodeGenericIterator<E, I>, impl FnMut(u8) -> char> {
+    pub fn as_char_iter(
+        self,
+    ) -> core::iter::Map<EncodeGenericIterator<E, I>, impl FnMut(u8) -> char> {
         self.map(|x| x as char)
     }
 }
