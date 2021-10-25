@@ -1,8 +1,8 @@
-extern crate criterion;
 extern crate base91;
+extern crate criterion;
 
+use base91::{slice_decode, slice_encode};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use base91::{slice_encode, slice_decode};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut buf: [u8; 10240] = [0; 10240];

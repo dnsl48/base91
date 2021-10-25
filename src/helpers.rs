@@ -1,6 +1,9 @@
 use crate::{DecodeIterator, EncodeIterator};
 
-#[deprecated(since="0.1.0", note="Convert to EncodeIterator::new(data).for_each(out)")]
+#[deprecated(
+    since = "0.1.0",
+    note = "Convert to EncodeIterator::new(data).for_each(out)"
+)]
 pub fn iter_encode<I, O>(data: I, out: O)
 where
     I: Iterator<Item = u8>,
@@ -9,7 +12,10 @@ where
     EncodeIterator::new(data).for_each(out);
 }
 
-#[deprecated(since="0.1.0", note="Convert to EncodeIterator::new(data).for_each(out)")]
+#[deprecated(
+    since = "0.1.0",
+    note = "Convert to EncodeIterator::new(data).for_each(out)"
+)]
 pub fn iter_decode<I, O>(data: I, out: O)
 where
     I: Iterator<Item = u8>,
@@ -19,7 +25,7 @@ where
 }
 
 /// Encode the `value` into ASCII according to base91 method.
-/// 
+///
 /// Preallocates the destination Vector once and writes the encoded data into it.
 #[cfg(any(feature = "std", test))]
 pub fn slice_encode(value: &[u8]) -> Vec<u8> {
@@ -31,7 +37,7 @@ pub fn slice_encode(value: &[u8]) -> Vec<u8> {
 }
 
 /// Decode the `value` into binary data according to base91 method.
-/// 
+///
 /// Preallocates the destination Vector once and writes the encoded data into it.
 #[cfg(any(feature = "std", test))]
 pub fn slice_decode(value: &[u8]) -> Vec<u8> {

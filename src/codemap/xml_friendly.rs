@@ -38,7 +38,6 @@ impl Encoding for XmlFriendly {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     #[test]
